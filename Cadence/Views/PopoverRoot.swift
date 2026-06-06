@@ -51,7 +51,7 @@ struct ReckonedView: View {
             .buttonStyle(.link)
             .font(.caption)
             .popover(isPresented: $showingNewSessionPicker) {
-                NewSessionPickerView { reckoningTime in
+                FutureTimePickerView(title: "Reckoning time for this session", confirmLabel: "Start") { reckoningTime in
                     coord.startNewSession(reckoningTime: reckoningTime)
                     showingNewSessionPicker = false
                 }
@@ -82,21 +82,12 @@ struct AutoMissedView: View {
             .buttonStyle(.link)
             .font(.caption)
             .popover(isPresented: $showingNewSessionPicker) {
-                NewSessionPickerView { reckoningTime in
+                FutureTimePickerView(title: "Reckoning time for this session", confirmLabel: "Start") { reckoningTime in
                     coord.startNewSession(reckoningTime: reckoningTime)
                     showingNewSessionPicker = false
                 }
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-    }
-}
-
-/// Picks a reckoning time for a new session. Constrained to between now and midnight.
-private struct NewSessionPickerView: View {
-    let onPick: (String) -> Void
-
-    var body: some View {
-        FutureTimePickerView(title: "Reckoning time for this session", confirmLabel: "Start", onPick: onPick)
     }
 }

@@ -37,7 +37,7 @@ struct TaskView: View {
                 }
                 .buttonStyle(.plain)
                 .popover(isPresented: $showingDelayPicker) {
-                    DelayReckoningView(currentTime: coord.today.reckoningTime) { newTime in
+                    FutureTimePickerView(title: "Delay reckoning until…", confirmLabel: "Set") { newTime in
                         coord.delayReckoning(to: newTime)
                         showingDelayPicker = false
                     }
@@ -139,11 +139,3 @@ struct AllDoneView: View {
     }
 }
 
-struct DelayReckoningView: View {
-    let currentTime: String
-    let onPick: (String) -> Void
-
-    var body: some View {
-        FutureTimePickerView(title: "Delay reckoning until…", confirmLabel: "Set", onPick: onPick)
-    }
-}

@@ -78,15 +78,11 @@ struct ReckoningView: View {
     @State private var skipReasons: [Int64: String] = [:]
 
     private var allResolved: Bool {
-        let unresolved = tasks.filter {
-            $0.status == .pending && !retroactiveDoneIds.contains($0.id ?? -1)
-        }
-        for t in unresolved {
-            let id = t.id ?? -1
-            let reason = skipReasons[id]?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-            if reason.isEmpty { return false }
-        }
-        return true
+        allReckoningTasksResolved(
+            tasks: tasks,
+            retroactiveDoneIds: retroactiveDoneIds,
+            skipReasons: skipReasons
+        )
     }
 
     var body: some View {
@@ -109,11 +105,12 @@ struct ReckoningView: View {
                         }
 
                         ScrollView {
-                            VStack(alignment: .leading, spacing: 14) {
-                                ForEach(tasks, id: \.id) { task in
-                                    row(task)
-                                }
-                            }
+                            ReckoningTaskList(
+                                tasks: tasks,
+                                retroactiveDoneIds: $retroactiveDoneIds,
+                                skipReasons: $skipReasons,
+                                style: .prominent
+                            )
                         }
                         .frame(maxHeight: 360)
 
@@ -148,47 +145,6 @@ struct ReckoningView: View {
             .shadow(radius: 30)
     }
 
-    @ViewBuilder
-    private func row(_ task: DailyTask) -> some View {
-        let id = task.id ?? -1
-        VStack(alignment: .leading, spacing: 6) {
-            HStack(alignment: .top, spacing: 10) {
-                if task.status == .done {
-                    Image(systemName: "checkmark.circle.fill")
-                        .foregroundStyle(.green)
-                        .font(.title3)
-                    Text(task.title).strikethrough().font(.title3)
-                } else if retroactiveDoneIds.contains(id) {
-                    Button(action: { retroactiveDoneIds.remove(id) }) {
-                        Image(systemName: "checkmark.square.fill")
-                            .foregroundStyle(.green)
-                            .font(.title3)
-                    }.buttonStyle(.plain)
-                    Text(task.title).strikethrough().font(.title3)
-                } else {
-                    Button(action: {
-                        retroactiveDoneIds.insert(id)
-                        skipReasons[id] = nil
-                    }) {
-                        Image(systemName: "square")
-                            .font(.title3)
-                    }.buttonStyle(.plain)
-                    Text(task.title).font(.title3)
-                }
-                Spacer()
-            }
-            if task.status != .done && !retroactiveDoneIds.contains(id) {
-                TextField("Why didn't this happen?", text: Binding(
-                    get: { skipReasons[id] ?? "" },
-                    set: { skipReasons[id] = $0 }
-                ), axis: .vertical)
-                .textFieldStyle(.roundedBorder)
-                .lineLimit(2...4)
-                .padding(.leading, 32)
-            }
-        }
-    }
-
     /// Caption shown at the top of the reckoning window: when the plan was locked
     /// (i.e. when reckoning was first configured) and what reckoning time was set.
     /// If the user later delayed reckoning, `day.reckoningTime` reflects the latest
@@ -198,10 +154,7 @@ struct ReckoningView: View {
         guard let lockedAt = day.lockedAt else {
             return timePart + "."
         }
-        let formatter = DateFormatter()
-        formatter.dateStyle = .medium
-        formatter.timeStyle = .short
-        return "Plan locked \(formatter.string(from: lockedAt)). " + timePart + "."
+        return "Plan locked \(lockedAtFormatter.string(from: lockedAt)). " + timePart + "."
     }
 
     private func finalReasons() -> [Int64: String] {
@@ -215,3 +168,10 @@ struct ReckoningView: View {
         return result
     }
 }
+
+private let lockedAtFormatter: DateFormatter = {
+    let f = DateFormatter()
+    f.dateStyle = .medium
+    f.timeStyle = .short
+    return f
+}()

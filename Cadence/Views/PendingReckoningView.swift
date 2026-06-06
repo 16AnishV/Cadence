@@ -8,19 +8,12 @@ struct PendingReckoningView: View {
     private var day: Day? { coord.pendingReckoningDay }
 
     private var allResolved: Bool {
-        guard let day = day else { return false }
-        let unresolved = coord.pendingReckoningTasks.filter {
-            $0.status == .pending && !retroactiveDoneIds.contains($0.id ?? -1)
-        }
-        for t in unresolved {
-            let id = t.id ?? -1
-            let reason = skipReasons[id]?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-            if reason.isEmpty {
-                return false
-            }
-        }
-        _ = day
-        return true
+        guard day != nil else { return false }
+        return allReckoningTasksResolved(
+            tasks: coord.pendingReckoningTasks,
+            retroactiveDoneIds: retroactiveDoneIds,
+            skipReasons: skipReasons
+        )
     }
 
     var body: some View {
@@ -37,11 +30,12 @@ struct PendingReckoningView: View {
                 .foregroundStyle(.secondary)
 
             ScrollView {
-                VStack(alignment: .leading, spacing: 10) {
-                    ForEach(coord.pendingReckoningTasks, id: \.id) { task in
-                        taskRow(task)
-                    }
-                }
+                ReckoningTaskList(
+                    tasks: coord.pendingReckoningTasks,
+                    retroactiveDoneIds: $retroactiveDoneIds,
+                    skipReasons: $skipReasons,
+                    style: .compact
+                )
             }
             .frame(maxHeight: 240)
 
@@ -57,41 +51,6 @@ struct PendingReckoningView: View {
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-    }
-
-    @ViewBuilder
-    private func taskRow(_ task: DailyTask) -> some View {
-        let id = task.id ?? -1
-        VStack(alignment: .leading, spacing: 4) {
-            HStack(alignment: .top) {
-                if task.status == .done {
-                    Text("✓").foregroundStyle(.green)
-                    Text(task.title).strikethrough()
-                } else if retroactiveDoneIds.contains(id) {
-                    Image(systemName: "checkmark.square.fill")
-                        .foregroundStyle(.green)
-                        .onTapGesture {
-                            retroactiveDoneIds.remove(id)
-                        }
-                    Text(task.title).strikethrough()
-                } else {
-                    Image(systemName: "square")
-                        .onTapGesture {
-                            retroactiveDoneIds.insert(id)
-                            skipReasons[id] = nil
-                        }
-                    Text(task.title)
-                }
-            }
-            if task.status != .done && !retroactiveDoneIds.contains(id) {
-                TextField("Why didn't this happen?", text: Binding(
-                    get: { skipReasons[id] ?? "" },
-                    set: { skipReasons[id] = $0 }
-                ))
-                .textFieldStyle(.roundedBorder)
-                .padding(.leading, 22)
-            }
-        }
     }
 
     private func submit() {

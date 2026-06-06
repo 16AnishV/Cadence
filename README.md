@@ -43,6 +43,7 @@ Cadence/
     ├── main.swift                     Entry point (NSApplication + AppDelegate)
     ├── AppDelegate.swift              NSStatusItem, popover, window controllers
     ├── AppCoordinator.swift           Timers, day rollover, state transitions
+    ├── MenuBarIconRenderer.swift      Half-sun progress icon (NSBezierPath)
     ├── NotificationHandler.swift      UNUserNotificationCenter scheduling
     ├── Models/
     │   ├── Day.swift                  Day record + GRDB conformance
@@ -55,6 +56,8 @@ Cadence/
         ├── PopoverRoot.swift          Routes by day state
         ├── PlannerView.swift          Morning planner (1–5 task fields)
         ├── TaskView.swift             Current-task surface (Done button)
+        ├── FutureTimePickerView.swift Shared HH:MM picker (now → midnight)
+        ├── ReckoningTaskList.swift    Shared task-resolution UI for reckoning
         ├── PendingReckoningView.swift Re-entry block for missed reckoning
         ├── ReckoningWindow.swift      Full-screen blocking reckoning
         ├── HistoryView.swift          Last 30 days drilldown
@@ -78,6 +81,5 @@ Any unreckoned state at midnight ──▶ AUTO_MISSED (streak = 0)
 
 ## Backlog (post-v1)
 
-Everything that isn't shipped yet. See the design doc at
-`/Users/anishvelagapudi/.claude/plans/build-a-mac-iphone-app-steady-flame.md`
-for the prioritized roadmap (v2: iPhone companion. v3: accountability sharpening. etc.).
+Tracked separately from the repo. Roughly: v2 iPhone companion, v3 accountability
+sharpening, then quality-of-life polish. See `CHANGELOG.md` for what's shipped.

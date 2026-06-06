@@ -1,5 +1,24 @@
 # Changelog
 
+## [1.3] — 2026-06-06
+
+### Reckoning time picker
+
+- **Per-minute granularity actually delivered.** 1.2 announced this but the picker still snapped to quarter-hour increments. Now any of 60 minutes per hour is selectable and the default selection is now+30 unsnapped.
+
+### Internal cleanup (no behavior change)
+
+- **Shared `ReckoningTaskList` view.** `PendingReckoningView` and `ReckoningView` previously kept two near-identical copies of the same retroactive-done + skip-reason UI; they now share `Cadence/Views/ReckoningTaskList.swift` with a `.compact`/`.prominent` style toggle for popover vs. full-screen sizing.
+- **Removed picker passthroughs.** `NewSessionPickerView` and `DelayReckoningView` were 3-line wrappers over `FutureTimePickerView`; call sites now use the picker directly.
+- **Cached `DateFormatter` instances.** `Repository.todayString` (called every refresh tick) and the HH:MM / "plan locked at" formatters were rebuilding a `DateFormatter` per call; now hoisted to file-private `static let`.
+- **Dead code purge.** Dropped the always-nil `icon: String?` element from `menuBarText`'s tuple return, an unused `_ = day` in `PendingReckoningView`, and the unused entries in `Day.Columns` / `DailyTask.Columns`. `Package.swift` no longer excludes the nonexistent `Resources/Assets.xcassets` path.
+
+### Documentation
+
+- **README project layout** now lists `MenuBarIconRenderer.swift`, `FutureTimePickerView.swift`, and `ReckoningTaskList.swift`.
+- **README backlog** no longer hard-codes an absolute path to a per-machine design doc.
+- **`.gitmessage`** now mentions `build_icon.sh` alongside `build_app.sh` for the `build` type, matching `COMMITS.md`.
+
 ## [1.2] — 2026-06-06
 
 ### App icon

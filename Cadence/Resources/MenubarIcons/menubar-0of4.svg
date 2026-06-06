@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <rect width="512" height="512" fill="#F5EFE6"/>
+  <path d="M 156 320 A 100 100 0 0 1 356 320" fill="none" stroke="#2B1810" stroke-width="10" stroke-linecap="round"/>
+  <!-- 4 ticks at 157.5°, 112.5°, 67.5°, 22.5°
+       157.5°: cos = -0.9239, sin = 0.3827. (256 - 92.4, 320 - 38.3) = (163.6, 281.7)
+       112.5°: cos = -0.3827, sin = 0.9239. (256 - 38.3, 320 - 92.4) = (217.7, 227.6)
+        67.5°: cos = 0.3827, sin = 0.9239. (256 + 38.3, 320 - 92.4) = (294.3, 227.6)
+        22.5°: cos = 0.9239, sin = 0.3827. (256 + 92.4, 320 - 38.3) = (348.4, 281.7) -->
+  <circle cx="164" cy="282" r="14" fill="#F5EFE6" stroke="#2B1810" stroke-width="6"/>
+  <circle cx="218" cy="228" r="14" fill="#F5EFE6" stroke="#2B1810" stroke-width="6"/>
+  <circle cx="294" cy="228" r="14" fill="#F5EFE6" stroke="#2B1810" stroke-width="6"/>
+  <circle cx="348" cy="282" r="14" fill="#F5EFE6" stroke="#2B1810" stroke-width="6"/>
+</svg>

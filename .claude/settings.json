@@ -1,0 +1,39 @@
+{
+  "_comments": {
+    "build_app.sh": "Build the app. SwiftPM's internal sandbox-exec collides with Claude's tool sandbox, so this needs to run outside the sandbox.",
+    "build_icon.sh": "Regenerate AppIcon.icns from AppIcon.svg. Only runs when the .icns is missing or the logo changes.",
+    "qlmanage": "Rasterize SVG to PNG via Quick Look. Called by build_icon.sh; sandbox blocks the Quick Look XPC service.",
+    "pkill -x Cadence": "Kill the running app instance before relaunching the rebuilt one. Sandbox blocks sysmond (process listing).",
+    "open Cadence.app": "Launch the rebuilt app via Launch Services. Sandbox blocks runningboardd XPC.",
+    "pgrep -lf Cadence": "Check whether Cadence is currently running. Same sysmond block as pkill.",
+    "ps aux": "Inspect running processes during debugging. Same sysmond block as pkill.",
+    "killall Finder Dock": "Refresh Finder/Dock icon caches after AppIcon.icns changes. macOS aggressively caches .icns lookups.",
+    "deny pkill/killall": "Block broad process-killing commands so the allowlist above can't be reused for unrelated targets. Deny rules take precedence over allow rules."
+  },
+  "permissions": {
+    "allow": [
+      "Bash(./build_app.sh)",
+      "Bash(./build_app.sh:*)",
+
+      "Bash(./build_icon.sh)",
+      "Bash(./build_icon.sh:*)",
+      "Bash(qlmanage -t:*)",
+
+      "Bash(pkill -x Cadence)",
+      "Bash(pkill -x Cadence:*)",
+      "Bash(open /Users/anishvelagapudi/Documents/VibeCode/Cadence/Cadence.app)",
+      "Bash(open /Users/anishvelagapudi/Documents/VibeCode/Cadence/Cadence.app:*)",
+
+      "Bash(pgrep -lf Cadence)",
+      "Bash(pgrep -lf Cadence:*)",
+      "Bash(ps aux)",
+      "Bash(killall Finder Dock)",
+      "Bash(killall Finder)",
+      "Bash(killall Dock)"
+    ],
+    "deny": [
+      "Bash(pkill:*)",
+      "Bash(killall:*)"
+    ]
+  }
+}

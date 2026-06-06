@@ -1,0 +1,19 @@
+
+
+# <type>(<scope>): <subject>     # ≤72 chars, imperative mood
+#
+# <body — explain *why*, not *what*. Wrap at ~72 cols.>
+#
+# <optional footer: BREAKING CHANGE: ..., refs #N>
+#
+# Types:
+#   feat     — user-visible new capability
+#   fix      — bug fix
+#   ux       — UI/copy/visual polish, no new capability
+#   build    — build_app.sh, Package.swift, icon, Info.plist
+#   refactor — restructure, no behavior change
+#   chore    — tooling, scripts, repo housekeeping
+#   docs     — README / CHANGELOG / COMMITS
+#   style    — formatting only
+#
+# See COMMITS.md for full convention and examples.

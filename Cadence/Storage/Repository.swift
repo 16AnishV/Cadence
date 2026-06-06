@@ -10,12 +10,19 @@ struct Repository {
 
     // MARK: - Date helpers
 
-    static func todayString(_ now: Date = Date()) -> String {
+    /// Hot-path formatter (called by every refresh tick + day-rollover check).
+    /// `DateFormatter` is thread-safe for read after configuration; the cache
+    /// stays valid because we always use the user's current calendar/timezone.
+    private static let dateOnlyFormatter: DateFormatter = {
         let f = DateFormatter()
         f.dateFormat = "yyyy-MM-dd"
         f.calendar = Calendar.current
         f.timeZone = TimeZone.current
-        return f.string(from: now)
+        return f
+    }()
+
+    static func todayString(_ now: Date = Date()) -> String {
+        dateOnlyFormatter.string(from: now)
     }
 
     /// Calendar date prefix from a session date string. '2026-06-05' -> '2026-06-05'.

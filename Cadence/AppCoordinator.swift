@@ -113,28 +113,28 @@ final class AppCoordinator: ObservableObject {
 
     // MARK: - Menu bar text
 
-    func menuBarText() -> (icon: String?, text: String) {
+    func menuBarText() -> String {
         let streakPart = "🔥 \(streak)"
         if pendingReckoningDay != nil {
-            return (nil, "\(streakPart) · ⏰ Yesterday's reckoning")
+            return "\(streakPart) · ⏰ Yesterday's reckoning"
         }
         switch today.state {
         case .noPlan:
-            return (nil, "\(streakPart) · No plan yet — click to plan")
+            return "\(streakPart) · No plan yet — click to plan"
         case .locked:
             if let current = todayTasks.first(where: { $0.status == .pending }) {
                 let truncated = String(current.title.prefix(40))
-                return (nil, "\(streakPart) · \(truncated)")
+                return "\(streakPart) · \(truncated)"
             }
-            return (nil, "\(streakPart) · …")
+            return "\(streakPart) · …"
         case .allDone:
-            return (nil, "\(streakPart) · ✅ All done — reckoning at \(today.reckoningTime)")
+            return "\(streakPart) · ✅ All done — reckoning at \(today.reckoningTime)"
         case .reckoningOpen:
-            return (nil, "\(streakPart) · ⏰ Reckoning open")
+            return "\(streakPart) · ⏰ Reckoning open"
         case .reckoned:
-            return (nil, "\(streakPart) · ✅ Day reckoned")
+            return "\(streakPart) · ✅ Day reckoned"
         case .autoMissed:
-            return (nil, "\(streakPart) · 💀 Day missed")
+            return "\(streakPart) · 💀 Day missed"
         }
     }
 
@@ -329,8 +329,12 @@ func parseReckoningTime(_ hhmm: String, on day: Date) -> Date? {
     return Calendar.current.date(from: comps)
 }
 
-func formatHHMM(_ date: Date) -> String {
+private let hhmmFormatter: DateFormatter = {
     let f = DateFormatter()
     f.dateFormat = "HH:mm"
-    return f.string(from: date)
+    return f
+}()
+
+func formatHHMM(_ date: Date) -> String {
+    hhmmFormatter.string(from: date)
 }

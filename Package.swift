@@ -20,7 +20,6 @@ let package = Package(
             ],
             path: "Cadence",
             exclude: [
-                "Resources/Assets.xcassets",
                 "Resources/AppIcon.svg",
                 "Resources/AppIcon.icns",
                 "Resources/MenubarIcons"

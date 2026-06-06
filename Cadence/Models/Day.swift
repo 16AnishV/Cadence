@@ -14,10 +14,6 @@ struct Day: Codable, Equatable, Hashable, FetchableRecord, PersistableRecord {
     enum Columns {
         static let date = Column(CodingKeys.date)
         static let state = Column(CodingKeys.state)
-        static let lockedAt = Column(CodingKeys.lockedAt)
-        static let reckonedAt = Column(CodingKeys.reckonedAt)
-        static let reckoningTime = Column(CodingKeys.reckoningTime)
-        static let streakAfter = Column(CodingKeys.streakAfter)
     }
 
     enum CodingKeys: String, CodingKey {

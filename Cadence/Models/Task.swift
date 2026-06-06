@@ -27,12 +27,7 @@ struct DailyTask: Codable, Equatable, FetchableRecord, MutablePersistableRecord 
     }
 
     enum Columns {
-        static let id = Column(CodingKeys.id)
         static let date = Column(CodingKeys.date)
         static let position = Column(CodingKeys.position)
-        static let title = Column(CodingKeys.title)
-        static let status = Column(CodingKeys.status)
-        static let doneAt = Column(CodingKeys.doneAt)
-        static let skipReason = Column(CodingKeys.skipReason)
     }
 }

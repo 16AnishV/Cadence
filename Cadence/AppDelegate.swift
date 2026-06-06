@@ -167,20 +167,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // Show the progress icon only when there's an active locked plan or all
         // tasks are done. In other states (no plan yet, reckoning, missed) the
         // half-sun has no progress to report, so we fall back to text-only.
-        let progress = coordinator.menuBarProgress()
-        if let progress = progress {
+        if let progress = coordinator.menuBarProgress() {
             button.image = MenuBarIconRenderer.icon(done: progress.done, total: progress.total)
             button.imagePosition = .imageLeading
         } else {
             button.image = nil
         }
 
-        let (icon, text) = coordinator.menuBarText()
-        let attr = NSMutableAttributedString()
-        if let icon = icon {
-            attr.append(NSAttributedString(string: icon + " "))
-        }
-        attr.append(NSAttributedString(string: text))
-        button.attributedTitle = attr
+        button.attributedTitle = NSAttributedString(string: coordinator.menuBarText())
     }
 }

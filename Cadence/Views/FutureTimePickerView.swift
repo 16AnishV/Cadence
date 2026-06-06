@@ -1,8 +1,8 @@
 import SwiftUI
 
-/// Picks a HH:MM time strictly between "now" and midnight. Hours before the current
-/// hour are hidden; when the selected hour equals the current hour, only minute
-/// choices after the current minute are shown.
+/// Picks a HH:MM time strictly between "now" and midnight, at per-minute
+/// granularity. Hours before the current hour are hidden; when the selected hour
+/// equals the current hour, only minute choices after the current minute are shown.
 ///
 /// If time passes between the picker rendering and the user clicking Confirm and
 /// the resulting time is in the past, the picker still emits the chosen value —
@@ -62,21 +62,12 @@ struct FutureTimePickerView: View {
             let now = Date()
             nowHour = Calendar.current.component(.hour, from: now)
             nowMinute = Calendar.current.component(.minute, from: now)
-            // Default selection: a sensible "soon-ish" time. Aim for ~30 min from
-            // now rounded to the next 15-minute slot, capped before midnight.
+            // Default selection: ~30 min from now, capped before midnight. No
+            // rounding — the picker is per-minute, so any value is valid.
             let target = now.addingTimeInterval(30 * 60)
-            let h = Calendar.current.component(.hour, from: target)
-            let m = Calendar.current.component(.minute, from: target)
-            // Snap to next quarter hour
-            let quarter = ((m + 14) / 15) * 15
-            if quarter >= 60 {
-                hour = min(h + 1, 23)
-                minute = 0
-            } else {
-                hour = h
-                minute = quarter
-            }
-            // Clamp to valid window. If we landed in a hour with no remaining
+            hour = min(Calendar.current.component(.hour, from: target), 23)
+            minute = Calendar.current.component(.minute, from: target)
+            // Clamp to valid window. If we landed in an hour with no remaining
             // minutes, bump forward.
             let validHours = availableHours()
             if let firstHour = validHours.first {
@@ -92,7 +83,7 @@ struct FutureTimePickerView: View {
     }
 
     /// All hours from current hour through 23 — but exclude the current hour if
-    /// no remaining quarter-hours fit before the next hour boundary.
+    /// no remaining minutes fit before the next hour boundary.
     private func availableHours() -> [Int] {
         var hours = Array(nowHour...23)
         if let first = hours.first, availableMinutes(forHour: first).isEmpty {
@@ -101,15 +92,14 @@ struct FutureTimePickerView: View {
         return hours
     }
 
-    /// Quarter-hour minute choices (0, 15, 30, 45) filtered so the resulting time
-    /// is strictly after `now`.
+    /// Per-minute choices (00–59) filtered so the resulting time is strictly
+    /// after `now`.
     private func availableMinutes(forHour h: Int) -> [Int] {
-        let candidates = [0, 15, 30, 45]
         if h > nowHour {
-            return candidates
+            return Array(0..<60)
         }
         if h == nowHour {
-            return candidates.filter { $0 > nowMinute }
+            return Array((nowMinute + 1)..<60)
         }
         return []
     }

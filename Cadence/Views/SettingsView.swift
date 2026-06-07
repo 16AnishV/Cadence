@@ -3,8 +3,7 @@ import SwiftUI
 
 struct SettingsView: View {
     @EnvironmentObject var coord: AppCoordinator
-    @State private var hour: Int = 18
-    @State private var minute: Int = 0
+    @State private var time: Date = Self.defaultTime()
     @State private var launchAtLogin: Bool = true
     @State private var showResetConfirm = false
 
@@ -13,26 +12,14 @@ struct SettingsView: View {
             Text("Settings")
                 .font(.title2.bold())
 
-            VStack(alignment: .leading, spacing: 8) {
-                Text("Default reckoning time").font(.headline)
-                HStack(spacing: 6) {
-                    Picker("", selection: $hour) {
-                        ForEach(0..<24, id: \.self) { h in
-                            Text(String(format: "%02d", h)).tag(h)
-                        }
-                    }
-                    .frame(width: 70)
-                    Text(":")
-                    Picker("", selection: $minute) {
-                        ForEach(0..<60, id: \.self) { m in
-                            Text(String(format: "%02d", m)).tag(m)
-                        }
-                    }
-                    .frame(width: 70)
+            VStack(alignment: .leading, spacing: 4) {
+                HStack(spacing: 8) {
+                    Text("Default reckoning time")
+                    DatePicker("", selection: $time, displayedComponents: .hourAndMinute)
+                        .labelsHidden()
                     Spacer()
                     Button("Apply") {
-                        let hhmm = String(format: "%02d:%02d", hour, minute)
-                        coord.setReckoningTime(hhmm)
+                        coord.setReckoningTime(Self.hhmm(from: time))
                     }
                 }
                 Text("Applies to today (if not yet reckoned) and all future days.")
@@ -82,14 +69,24 @@ struct SettingsView: View {
         .frame(width: 480, alignment: .topLeading)
         .fixedSize(horizontal: false, vertical: true)
         .onAppear {
-            let hhmm = coord.repo.reckoningTimeDefault
-            let parts = hhmm.split(separator: ":")
-            if parts.count == 2 {
-                hour = Int(parts[0]) ?? 18
-                minute = Int(parts[1]) ?? 0
-            }
+            time = Self.parse(hhmm: coord.repo.reckoningTimeDefault) ?? Self.defaultTime()
             launchAtLogin = (coord.repo.getState("launch_at_login") ?? "true") == "true"
         }
+    }
+
+    private static func hhmm(from date: Date) -> String {
+        let comps = Calendar.current.dateComponents([.hour, .minute], from: date)
+        return String(format: "%02d:%02d", comps.hour ?? 0, comps.minute ?? 0)
+    }
+
+    private static func parse(hhmm: String) -> Date? {
+        let parts = hhmm.split(separator: ":")
+        guard parts.count == 2, let h = Int(parts[0]), let m = Int(parts[1]) else { return nil }
+        return Calendar.current.date(bySettingHour: h, minute: m, second: 0, of: Date())
+    }
+
+    private static func defaultTime() -> Date {
+        Calendar.current.date(bySettingHour: 18, minute: 0, second: 0, of: Date()) ?? Date()
     }
 
     private func toggleLaunchAtLogin(_ enable: Bool) {

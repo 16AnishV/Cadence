@@ -1,5 +1,23 @@
 # Changelog
 
+## [1.4] — 2026-06-06
+
+### Reckoning time picker
+
+- **Native graphical DatePicker everywhere.** All three time pickers (Settings default, bonus session start, delay-reckoning popover) now use SwiftUI's `DatePicker(displayedComponents: .hourAndMinute)` instead of the custom dual hour/minute `Picker` rows. Renders as a tappable HH:MM field with hidden steppers — click to type, arrow keys to nudge. Smallest footprint, fully keyboard-driven, and the future-time variant drops ~50 lines of custom range-filtering logic in favor of the native `in: now...endOfDay` constraint.
+
+### Settings
+
+- **Inline "Default reckoning time" row.** Label, time picker, and `Apply` button now sit on a single row instead of stacking the header above the controls. Part of a broader minimalist/condensed direction for the app — prefer dense one-row layouts over multi-row sections when context already makes the meaning clear.
+
+### Reckoning copy
+
+- **Unified "Reckoning at HH:MM" phrasing.** The bonus session picker title, delay-reckoning picker title, and full-screen reckoning window caption all collapse onto the same short phrase. Replaces "Reckoning time for this session" / "Delay reckoning until…" / "Reckoning set for …".
+
+### Project tooling
+
+- **`pkill` / `killall` no longer denied.** `.claude/settings.json` previously blocked the entire `pkill:*` and `killall:*` patterns to keep the allowlist narrow, but this also blocked the standard `pkill -x Cadence` step in the build/relaunch loop, prompting on every iteration. Removed both deny rules; the explicit allow for `pkill -x Cadence` and `killall Finder Dock` is sufficient.
+
 ## [1.3] — 2026-06-06
 
 ### Reckoning time picker

@@ -150,7 +150,7 @@ struct ReckoningView: View {
     /// If the user later delayed reckoning, `day.reckoningTime` reflects the latest
     /// value while `day.lockedAt` still points to the original lock.
     private func configuredAtCaption() -> String {
-        let timePart = "Reckoning set for \(day.reckoningTime)"
+        let timePart = "Reckoning at \(day.reckoningTime)"
         guard let lockedAt = day.lockedAt else {
             return timePart + "."
         }

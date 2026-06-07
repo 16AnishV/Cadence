@@ -51,7 +51,7 @@ struct ReckonedView: View {
             .buttonStyle(.link)
             .font(.caption)
             .popover(isPresented: $showingNewSessionPicker) {
-                FutureTimePickerView(title: "Reckoning time for this session", confirmLabel: "Start") { reckoningTime in
+                FutureTimePickerView(title: "Reckoning at", confirmLabel: "Start") { reckoningTime in
                     coord.startNewSession(reckoningTime: reckoningTime)
                     showingNewSessionPicker = false
                 }
@@ -82,7 +82,7 @@ struct AutoMissedView: View {
             .buttonStyle(.link)
             .font(.caption)
             .popover(isPresented: $showingNewSessionPicker) {
-                FutureTimePickerView(title: "Reckoning time for this session", confirmLabel: "Start") { reckoningTime in
+                FutureTimePickerView(title: "Reckoning at", confirmLabel: "Start") { reckoningTime in
                     coord.startNewSession(reckoningTime: reckoningTime)
                     showingNewSessionPicker = false
                 }

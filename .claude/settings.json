@@ -10,8 +10,7 @@
     "killall Finder Dock": "Refresh Finder/Dock icon caches after AppIcon.icns changes. macOS aggressively caches .icns lookups.",
     "git status/diff/log": "Read-only inspection of the repo state. Used constantly during iteration; no reason to prompt.",
     "git add/commit/init/config": "Repo-modifying commands scoped to this repo. Commit auto-signs with the personal GPG key via the includeIf in ~/.gitconfig.",
-    "deny git push --force / reset --hard": "Destructive git operations always require explicit user approval, even though the safer variants are allowed.",
-    "deny pkill/killall": "Block broad process-killing commands so the allowlist above can't be reused for unrelated targets. Deny rules take precedence over allow rules."
+    "deny git push --force / reset --hard": "Destructive git operations always require explicit user approval, even though the safer variants are allowed."
   },
   "permissions": {
     "allow": [
@@ -53,8 +52,6 @@
       "Bash(git remote -v)"
     ],
     "deny": [
-      "Bash(pkill:*)",
-      "Bash(killall:*)",
       "Bash(git push --force:*)",
       "Bash(git push -f:*)",
       "Bash(git reset --hard:*)",

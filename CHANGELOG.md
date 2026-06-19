@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.5] — 2026-06-19
+
+### Mid-session tasks
+
+- **Add tasks after the plan is locked.** The planner caps a new session at 5 tasks, but until now there was no way to add one you thought of after starting. An inline "Add a task" field now sits in the active-session popover — type a title, press Enter or click `+`, and it appends to today's running list. Progress dots update to match.
+- **No cap once you've started.** The 5-task limit only governs the initial planner lock; a session already underway can grow freely. Start with 2, end with 7 — whatever the day needs.
+- **Works from the "all done" state too.** Finishing every task flips the popover to the all-done view, which also carries the add field. Adding a task there returns the day to its in-progress state so the new task can't be skipped past and reckoning stays out of the way until you're actually done. Sessions already reckoned or auto-missed refuse new tasks.
+
 ## [1.4] — 2026-06-06
 
 ### Reckoning time picker

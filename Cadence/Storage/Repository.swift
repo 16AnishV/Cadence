@@ -257,6 +257,42 @@ struct Repository {
         }
     }
 
+    /// Append a single pending task to the current in-flight session. Unlike `lockToday`,
+    /// there's intentionally no 5-task cap once a session has started — the planner limits
+    /// the initial lock, but a running session can grow freely.
+    @discardableResult
+    func addTask(title: String) -> DailyTask? {
+        let clean = title.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !clean.isEmpty else { return nil }
+        let sessionDate = currentSessionDateString()
+
+        return try? db.write { dbConn in
+            // Only allow adding to an in-flight session, never a reckoned/missed one.
+            guard let day = try Day.fetchOne(dbConn, key: sessionDate),
+                  day.state == .locked || day.state == .allDone else { return nil }
+
+            let maxPos = try Int.fetchOne(
+                dbConn,
+                sql: "SELECT MAX(position) FROM tasks WHERE date = ?",
+                arguments: [sessionDate]
+            ) ?? -1
+
+            var t = DailyTask(id: nil, date: sessionDate, position: maxPos + 1,
+                              title: clean, status: .pending, doneAt: nil, skipReason: nil)
+            try t.insert(dbConn)
+
+            // A new pending task means the day is no longer "all done": flip ALL_DONE → LOCKED
+            // so reckoning isn't prematurely available and TaskView shows the new task.
+            if day.state == .allDone {
+                try dbConn.execute(
+                    sql: "UPDATE days SET state = ? WHERE date = ?",
+                    arguments: [DayState.locked.rawValue, sessionDate]
+                )
+            }
+            return t
+        }
+    }
+
     // MARK: - Done
 
     func markDone(taskId: Int64) {

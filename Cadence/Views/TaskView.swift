@@ -27,6 +27,8 @@ struct TaskView: View {
                 }
             }
 
+            AddTaskField()
+
             HStack {
                 progressDots()
                 Spacer()
@@ -61,6 +63,37 @@ struct TaskView: View {
                     .frame(width: 8, height: 8)
             }
         }
+    }
+}
+
+/// Inline "add a task" affordance shown during an active session (in both `TaskView`
+/// and `AllDoneView`). Appends to the running session via `coord.addTask`; there's no
+/// 5-task cap here — that limit only applies to the initial planner lock.
+private struct AddTaskField: View {
+    @EnvironmentObject var coord: AppCoordinator
+    @State private var newTitle = ""
+
+    private var trimmed: String {
+        newTitle.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    var body: some View {
+        HStack(spacing: 8) {
+            TextField("Add a task", text: $newTitle)
+                .textFieldStyle(.roundedBorder)
+                .onSubmit(add)
+            Button(action: add) {
+                Image(systemName: "plus")
+            }
+            .buttonStyle(.borderless)
+            .disabled(trimmed.isEmpty)
+        }
+    }
+
+    private func add() {
+        guard !trimmed.isEmpty else { return }
+        coord.addTask(title: trimmed)
+        newTitle = ""
     }
 }
 
@@ -126,6 +159,7 @@ struct AllDoneView: View {
             Text("Reckoning at \(coord.today.reckoningTime).")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
+            AddTaskField()
             Button(action: {
                 coord.openReckoningNow()
             }) {

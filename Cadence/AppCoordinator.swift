@@ -187,6 +187,11 @@ final class AppCoordinator: ObservableObject {
         refreshState()
     }
 
+    func addTask(title: String) {
+        repo.addTask(title: title)
+        refreshState()
+    }
+
     // MARK: - Reckoning
 
     func openReckoningNow() {

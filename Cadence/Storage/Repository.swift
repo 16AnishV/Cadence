@@ -293,6 +293,29 @@ struct Repository {
         }
     }
 
+    // MARK: - Reorder
+
+    /// Persist a new task ordering for the given session. `orderedIds` must be the full set of
+    /// task ids for that session, in the desired top-to-bottom order. Rewrites `position`
+    /// contiguously (0..n). Only allowed while the session is in-flight (LOCKED/ALL_DONE),
+    /// mirroring `addTask`'s guard so a reckoned/missed day can't be mutated.
+    func reorderTasks(date: String, orderedIds: [Int64]) {
+        try? db.write { dbConn in
+            guard let day = try Day.fetchOne(dbConn, key: date),
+                  day.state == .locked || day.state == .allDone else { return }
+            // Guard against a stale ordering: only apply if orderedIds exactly matches the
+            // session's current task-id set (protects against a task added/removed between
+            // the UI snapshot and the drop).
+            let currentIds = try Int64.fetchSet(
+                dbConn, sql: "SELECT id FROM tasks WHERE date = ?", arguments: [date])
+            guard Set(orderedIds) == currentIds else { return }
+            for (idx, id) in orderedIds.enumerated() {
+                try dbConn.execute(
+                    sql: "UPDATE tasks SET position = ? WHERE id = ?", arguments: [idx, id])
+            }
+        }
+    }
+
     // MARK: - Done
 
     func markDone(taskId: Int64) {

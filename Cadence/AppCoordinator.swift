@@ -192,6 +192,13 @@ final class AppCoordinator: ObservableObject {
         refreshState()
     }
 
+    /// Persist a drag-reordered task list. `orderedIds` is the full set of today's task ids
+    /// in the new top-to-bottom order. Only touches `position` — status/done_at are untouched.
+    func reorderTasks(orderedIds: [Int64]) {
+        repo.reorderTasks(date: today.date, orderedIds: orderedIds)
+        refreshState()
+    }
+
     // MARK: - Reckoning
 
     func openReckoningNow() {

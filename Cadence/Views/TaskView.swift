@@ -1,4 +1,17 @@
 import SwiftUI
+import UniformTypeIdentifiers
+
+/// Lightweight drag payload carrying a task's id for drag-to-reorder.
+struct DraggableTaskID: Codable, Transferable {
+    let id: Int64
+    static var transferRepresentation: some TransferRepresentation {
+        CodableRepresentation(contentType: .cadenceTask)
+    }
+}
+
+extension UTType {
+    static let cadenceTask = UTType(exportedAs: "com.cadence.task")
+}
 
 struct TaskView: View {
     @EnvironmentObject var coord: AppCoordinator
@@ -6,6 +19,17 @@ struct TaskView: View {
 
     private var topPending: DailyTask? {
         coord.todayTasks.first { $0.status == .pending }
+    }
+
+    /// Move the dragged task so it lands at the target task's slot, then persist.
+    private func moveTask(draggedId: Int64, onto targetId: Int64) {
+        guard draggedId != targetId else { return }
+        var ids = coord.todayTasks.map { $0.id }.compactMap { $0 }
+        guard let from = ids.firstIndex(of: draggedId),
+              let to = ids.firstIndex(of: targetId) else { return }
+        ids.remove(at: from)
+        ids.insert(draggedId, at: to)
+        coord.reorderTasks(orderedIds: ids)
     }
 
     var body: some View {
@@ -21,9 +45,14 @@ struct TaskView: View {
 
             VStack(alignment: .leading, spacing: 8) {
                 ForEach(coord.todayTasks, id: \.id) { task in
-                    TaskRow(task: task, isCurrent: task.id == topPending?.id) {
-                        coord.markDone(taskId: task.id)
-                    }
+                    TaskRow(
+                        task: task,
+                        isCurrent: task.id == topPending?.id,
+                        onDone: { coord.markDone(taskId: task.id) },
+                        onDropTask: { draggedId in
+                            if let targetId = task.id { moveTask(draggedId: draggedId, onto: targetId) }
+                        }
+                    )
                 }
             }
 
@@ -101,9 +130,16 @@ private struct TaskRow: View {
     let task: DailyTask
     let isCurrent: Bool
     let onDone: () -> Void
+    let onDropTask: (Int64) -> Void
+
+    @State private var isTargeted = false
 
     var body: some View {
         HStack(alignment: .center, spacing: 10) {
+            Image(systemName: "line.3.horizontal")
+                .foregroundStyle(.tertiary)
+                .font(.callout)
+
             if task.status == .done {
                 Image(systemName: "checkmark.circle.fill")
                     .foregroundStyle(.green)
@@ -130,6 +166,20 @@ private struct TaskRow: View {
             RoundedRectangle(cornerRadius: 6)
                 .fill(isCurrent ? Color.accentColor.opacity(0.10) : Color.clear)
         )
+        .overlay(alignment: .top) {
+            if isTargeted {
+                RoundedRectangle(cornerRadius: 1)
+                    .fill(Color.accentColor)
+                    .frame(height: 2)
+            }
+        }
+        .contentShape(Rectangle())
+        .draggable(DraggableTaskID(id: task.id ?? -1))
+        .dropDestination(for: DraggableTaskID.self) { payload, _ in
+            guard let dragged = payload.first else { return false }
+            onDropTask(dragged.id)
+            return true
+        } isTargeted: { isTargeted = $0 }
     }
 }
 

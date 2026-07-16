@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.6] — 2026-07-16
+
+### Reorder tasks
+
+- **Drag to reorder a locked plan.** Once today's plan is locked, tasks in the popover can be reordered by dragging. Each row carries a leading `≡` handle as the grab affordance; the row lifts, and a thin accent line marks where it'll land. Whole-row dragging and a native `List` (with its heavier chrome) were both considered and passed over — the explicit handle keeps the drag discoverable while preserving the condensed custom-row look.
+- **Every task moves, done or pending.** There's no restriction to pending-only tasks; a completed task can be dragged too and keeps its checkmark and completion time in the new slot. Reordering never touches a task's status — only its position. Moving a pending task to the top makes it the new "current" task, which also updates the menu bar icon.
+- **Order sticks.** The new arrangement writes to the `position` column and survives closing the popover and relaunching the app. Reordering is only allowed while a session is in flight (locked or all-done, matching where you can add tasks) and a stale drop whose task set no longer matches the session is rejected rather than applied.
+
 ## [1.5] — 2026-06-19
 
 ### Mid-session tasks

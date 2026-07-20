@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.8] — 2026-07-20
+
+### Fixes
+
+- **Fresh installs no longer crash on first launch.** The v1.7 streak removal deleted `streak_after` from the v1 table-create *and* added a v2 migration to drop it — but on a brand-new install the column was never created, so the drop hit `no such column` and, because the migrator runs inside a `fatalError`, took the whole app down on first launch. Existing installs upgraded fine (they still had the column), which is why it slipped through. The v2 migration now checks for the column before dropping it, so it's a no-op on fresh installs and still cleans up for upgraders.
+
 ## [1.7] — 2026-07-20
 
 ### Streak removed

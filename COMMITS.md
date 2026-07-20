@@ -40,7 +40,6 @@ Free-form, lowercase. Examples used so far:
 - `notifications` — `NotificationHandler.swift` and reckoning timers
 - `icon` — menu bar icon or app icon
 - `picker` — time pickers
-- `streak` — streak math
 - `session` — multi-session-per-day logic
 - `claude` — `.claude/` config
 
@@ -60,8 +59,7 @@ feat(session): support multi-session-per-day with suffixed dates
 
 After a day is reckoned, the user can now start a fresh "bonus" session
 within the same calendar date. Implementation uses suffixed date keys
-(2026-06-05-2, -3, ...) so existing primary-day rows stay untouched and
-streak math is unchanged. Bonus sessions don't count toward streak.
+(2026-06-05-2, -3, ...) so existing primary-day rows stay untouched.
 ```
 
 ```

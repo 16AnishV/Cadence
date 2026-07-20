@@ -2,16 +2,15 @@
 
 A macOS menu bar accountability coach.
 
-Plan 1–5 tasks in the morning, lock the list, work through them one at a time. At reckoning time, a full-screen window blocks your screen and asks why you skipped what you skipped. Build a streak; lose it when you skip.
+Plan 1–5 tasks in the morning, lock the list, work through them one at a time. At reckoning time, a full-screen window blocks your screen and asks why you skipped what you skipped.
 
 ## What it does
 
 - **Morning planner** — type 1–5 tasks in priority order, click **Lock & Start**. List is immutable until tomorrow.
-- **Single-task UI** — menu bar shows `🔥 N · <current task>`. One **Done** button. No skip button.
+- **Single-task UI** — menu bar shows a half-sun progress icon (circles fill as tasks are marked done). One **Done** button. No skip button.
 - **Pre-reckoning warnings** — notifications at T-20 and T-10 minutes before reckoning. Each offers a "Delay" action so you can push reckoning back if you're deep in something.
 - **Full-screen reckoning** — at reckoning time, a blocking window appears. For each unfinished task, type why you didn't do it. You can also retroactively mark tasks as Done if you forgot to click the button. Submit to end the day.
-- **Streak** — all tasks Done at reckoning → streak +1. Anything skipped → streak resets to 0.
-- **Missed days auto-reset** — if you don't submit reckoning by midnight, the day auto-misses, streak resets to 0.
+- **Missed days auto-miss** — if you don't submit reckoning by midnight, the day auto-misses.
 
 ## Build & run
 
@@ -71,7 +70,7 @@ NO_PLAN ──Lock──▶ LOCKED ──Done×N──▶ ALL_DONE ──reckoni
                     │                                                                   │
                     └─────────────────reckoning_time────────────────────────────────────┘
 
-Any unreckoned state at midnight ──▶ AUTO_MISSED (streak = 0)
+Any unreckoned state at midnight ──▶ AUTO_MISSED
 ```
 
 ## Permissions to grant on first launch

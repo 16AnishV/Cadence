@@ -39,8 +39,6 @@ struct ReckonedView: View {
         VStack(alignment: .leading, spacing: 10) {
             Text("Day reckoned")
                 .font(.title2.bold())
-            Text("🔥 Streak: \(coord.streak)")
-                .font(.headline)
             Text("New day, new chance. Plan tomorrow.")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
@@ -69,7 +67,7 @@ struct AutoMissedView: View {
         VStack(alignment: .leading, spacing: 10) {
             Text("Day missed")
                 .font(.title2.bold())
-            Text("💀 Streak reset to 0.")
+            Text("💀 Day missed.")
                 .font(.headline)
                 .foregroundStyle(.red)
             Text("New day, new chance. Plan tomorrow.")

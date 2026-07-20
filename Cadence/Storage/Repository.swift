@@ -90,14 +90,6 @@ struct Repository {
         }
     }
 
-    var currentStreak: Int {
-        Int(getState("current_streak") ?? "0") ?? 0
-    }
-
-    func setCurrentStreak(_ value: Int) {
-        setState("current_streak", String(value))
-    }
-
     var reckoningTimeDefault: String {
         getState("reckoning_time_default") ?? "18:00"
     }
@@ -160,8 +152,7 @@ struct Repository {
             state: .noPlan,
             lockedAt: nil,
             reckonedAt: nil,
-            reckoningTime: reckoningTimeDefault,
-            streakAfter: nil
+            reckoningTime: reckoningTimeDefault
         )
         try? db.write { dbConn in
             try day.insert(dbConn)
@@ -188,8 +179,7 @@ struct Repository {
             state: .noPlan,
             lockedAt: nil,
             reckonedAt: nil,
-            reckoningTime: reckoningTime,
-            streakAfter: nil
+            reckoningTime: reckoningTime
         )
         try? db.write { dbConn in
             try day.insert(dbConn)
@@ -239,7 +229,7 @@ struct Repository {
         return try? db.write { dbConn in
             // Ensure session row exists. If not, create the primary calendar-date row.
             if try Day.fetchOne(dbConn, key: sessionDate) == nil {
-                let day = Day(date: sessionDate, state: .noPlan, lockedAt: nil, reckonedAt: nil, reckoningTime: reckoningTimeDefault, streakAfter: nil)
+                let day = Day(date: sessionDate, state: .noPlan, lockedAt: nil, reckonedAt: nil, reckoningTime: reckoningTimeDefault)
                 try day.insert(dbConn)
             }
 
@@ -364,11 +354,7 @@ struct Repository {
 
     /// Submit reckoning. retroactiveDoneIds will be marked DONE; for any remaining PENDING tasks,
     /// skipReasons[taskId] is required (caller validates non-empty before calling).
-    /// Streak math: only primary (non-suffixed) sessions advance or break the global streak.
-    /// Suffixed (bonus) sessions record their own streak_after for history visibility but don't
-    /// touch current_streak.
-    func submitReckoning(date: String, retroactiveDoneIds: Set<Int64>, skipReasons: [Int64: String]) -> Int {
-        var resultingStreakAfter = 0
+    func submitReckoning(date: String, retroactiveDoneIds: Set<Int64>, skipReasons: [Int64: String]) {
         try? db.write { dbConn in
             let now = Date()
 
@@ -386,45 +372,15 @@ struct Repository {
                 )
             }
 
-            let skippedCount = try Int.fetchOne(
-                dbConn,
-                sql: "SELECT COUNT(*) FROM tasks WHERE date = ? AND status = ?",
-                arguments: [date, TaskStatus.skipped.rawValue]
-            ) ?? 0
-
-            let currentStreakStr = try String.fetchOne(dbConn, sql: "SELECT value FROM app_state WHERE key = 'current_streak'") ?? "0"
-            let currentStreak = Int(currentStreakStr) ?? 0
-
-            let isBonusSession = Self.isSuffixedSession(date)
-
-            if isBonusSession {
-                // Bonus session: don't touch global streak. Record current value as streak_after
-                // so history shows the streak as of this row.
-                resultingStreakAfter = currentStreak
-            } else if skippedCount == 0 {
-                resultingStreakAfter = currentStreak + 1
-            } else {
-                resultingStreakAfter = 0
-            }
-
-            if !isBonusSession {
-                try dbConn.execute(
-                    sql: "UPDATE app_state SET value = ? WHERE key = 'current_streak'",
-                    arguments: [String(resultingStreakAfter)]
-                )
-            }
-
             try dbConn.execute(
-                sql: "UPDATE days SET state = ?, reckoned_at = ?, streak_after = ? WHERE date = ?",
-                arguments: [DayState.reckoned.rawValue, now, resultingStreakAfter, date]
+                sql: "UPDATE days SET state = ?, reckoned_at = ? WHERE date = ?",
+                arguments: [DayState.reckoned.rawValue, now, date]
             )
         }
-        return resultingStreakAfter
     }
 
-    /// Auto-miss a day at midnight: any pending tasks become skipped (no reason), streak resets to 0.
+    /// Auto-miss a day at midnight: any pending tasks become skipped (no reason).
     /// Refuses to auto-miss today (ever) or days already in a terminal state.
-    /// Bonus (suffixed) sessions auto-miss but do NOT reset the global streak.
     func autoMissDay(_ date: String) {
         // Compare calendar-date prefixes so a suffixed same-day session is correctly
         // considered "today" until the calendar rolls over.
@@ -447,13 +403,9 @@ struct Repository {
                 arguments: [TaskStatus.skipped.rawValue, date, TaskStatus.pending.rawValue]
             )
             try dbConn.execute(
-                sql: "UPDATE days SET state = ?, streak_after = 0 WHERE date = ?",
+                sql: "UPDATE days SET state = ? WHERE date = ?",
                 arguments: [DayState.autoMissed.rawValue, date]
             )
-            // Only break the global streak when a primary session is being auto-missed.
-            if !Self.isSuffixedSession(date) {
-                try dbConn.execute(sql: "UPDATE app_state SET value = '0' WHERE key = 'current_streak'")
-            }
         }
     }
 

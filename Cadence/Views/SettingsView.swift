@@ -5,7 +5,6 @@ struct SettingsView: View {
     @EnvironmentObject var coord: AppCoordinator
     @State private var time: Date = Self.defaultTime()
     @State private var launchAtLogin: Bool = true
-    @State private var showResetConfirm = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
@@ -40,30 +39,6 @@ struct SettingsView: View {
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
             }
-
-            Divider()
-
-            VStack(alignment: .leading, spacing: 8) {
-                Button(role: .destructive) {
-                    showResetConfirm = true
-                } label: {
-                    Text("Reset streak to 0")
-                }
-                .confirmationDialog(
-                    "Reset streak?",
-                    isPresented: $showResetConfirm,
-                    titleVisibility: .visible
-                ) {
-                    Button("Reset", role: .destructive) {
-                        coord.repo.setCurrentStreak(0)
-                        coord.refreshState()
-                    }
-                    Button("Cancel", role: .cancel) {}
-                } message: {
-                    Text("Sets your current streak to 0. History is unchanged.")
-                }
-            }
-
         }
         .padding(20)
         .frame(width: 480, alignment: .topLeading)

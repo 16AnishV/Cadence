@@ -35,14 +35,9 @@ struct TaskView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
-            HStack {
-                Text("Today's plan")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                Spacer()
-                Text("🔥 \(coord.streak)")
-                    .font(.headline)
-            }
+            Text("Today's plan")
+                .font(.caption)
+                .foregroundStyle(.secondary)
 
             VStack(alignment: .leading, spacing: 8) {
                 ForEach(coord.todayTasks, id: \.id) { task in
@@ -200,13 +195,8 @@ struct AllDoneView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                Text("All done for today.")
-                    .font(.title2.bold())
-                Spacer()
-                Text("🔥 \(coord.streak)")
-                    .font(.headline)
-            }
+            Text("All done for today.")
+                .font(.title2.bold())
             Text("Reckoning at \(coord.today.reckoningTime).")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)

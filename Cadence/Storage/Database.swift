@@ -29,7 +29,6 @@ enum CadenceDatabase {
                 t.column("locked_at", .datetime)
                 t.column("reckoned_at", .datetime)
                 t.column("reckoning_time", .text).notNull()
-                t.column("streak_after", .integer)
             }
 
             try db.create(table: "tasks") { t in
@@ -47,10 +46,18 @@ enum CadenceDatabase {
                 t.column("value", .text).notNull()
             }
 
-            try db.execute(sql: "INSERT OR IGNORE INTO app_state (key, value) VALUES ('current_streak', '0')")
             try db.execute(sql: "INSERT OR IGNORE INTO app_state (key, value) VALUES ('reckoning_time_default', '18:00')")
             try db.execute(sql: "INSERT OR IGNORE INTO app_state (key, value) VALUES ('launch_at_login', 'true')")
             try db.execute(sql: "INSERT OR IGNORE INTO app_state (key, value) VALUES ('planner_snooze_count', '0')")
+        }
+
+        // Drop the streak concept entirely: the days.streak_after column and the
+        // current_streak app_state key. The feature was removed as not useful.
+        m.registerMigration("v2") { db in
+            try db.alter(table: "days") { t in
+                t.drop(column: "streak_after")
+            }
+            try db.execute(sql: "DELETE FROM app_state WHERE key = 'current_streak'")
         }
 
         return m

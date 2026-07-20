@@ -18,13 +18,8 @@ struct PendingReckoningView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
-            HStack {
-                Text("Yesterday's reckoning")
-                    .font(.title2.bold())
-                Spacer()
-                Text("🔥 \(coord.streak)")
-                    .font(.headline)
-            }
+            Text("Yesterday's reckoning")
+                .font(.title2.bold())
             Text("You didn't reckon \(day?.date ?? "yesterday"). Finish it before today's planner opens.")
                 .font(.caption)
                 .foregroundStyle(.secondary)

@@ -11,13 +11,8 @@ struct PlannerView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
-            HStack {
-                Text("Today's plan")
-                    .font(.title2.bold())
-                Spacer()
-                Text("🔥 \(coord.streak)")
-                    .font(.headline)
-            }
+            Text("Today's plan")
+                .font(.title2.bold())
 
             Text(prettyDate())
                 .font(.caption)

@@ -7,11 +7,10 @@ import SwiftUI
 final class AppCoordinator: ObservableObject {
     let repo = Repository()
 
-    @Published var today: Day = Day(date: "", state: .noPlan, lockedAt: nil, reckonedAt: nil, reckoningTime: "18:00", streakAfter: nil)
+    @Published var today: Day = Day(date: "", state: .noPlan, lockedAt: nil, reckonedAt: nil, reckoningTime: "18:00")
     @Published var todayTasks: [DailyTask] = []
     @Published var pendingReckoningDay: Day? = nil // Set if a previous day's reckoning is pending
     @Published var pendingReckoningTasks: [DailyTask] = []
-    @Published var streak: Int = 0
 
     var onMenuBarLabelChanged: (() -> Void)?
     var onShowReckoning: (() -> Void)?
@@ -86,7 +85,6 @@ final class AppCoordinator: ObservableObject {
         // Today
         self.today = repo.getOrCreateToday()
         self.todayTasks = repo.tasks(for: self.today.date)
-        self.streak = repo.currentStreak
 
         onMenuBarLabelChanged?()
     }
@@ -114,27 +112,25 @@ final class AppCoordinator: ObservableObject {
     // MARK: - Menu bar text
 
     func menuBarText() -> String {
-        let streakPart = "🔥 \(streak)"
         if pendingReckoningDay != nil {
-            return "\(streakPart) · ⏰ Yesterday's reckoning"
+            return "⏰ Yesterday's reckoning"
         }
         switch today.state {
         case .noPlan:
-            return "\(streakPart) · No plan yet — click to plan"
+            return "No plan yet — click to plan"
         case .locked:
             if let current = todayTasks.first(where: { $0.status == .pending }) {
-                let truncated = String(current.title.prefix(40))
-                return "\(streakPart) · \(truncated)"
+                return String(current.title.prefix(40))
             }
-            return "\(streakPart) · …"
+            return "…"
         case .allDone:
-            return "\(streakPart) · ✅ All done — reckoning at \(today.reckoningTime)"
+            return "✅ All done — reckoning at \(today.reckoningTime)"
         case .reckoningOpen:
-            return "\(streakPart) · ⏰ Reckoning open"
+            return "⏰ Reckoning open"
         case .reckoned:
-            return "\(streakPart) · ✅ Day reckoned"
+            return "✅ Day reckoned"
         case .autoMissed:
-            return "\(streakPart) · 💀 Day missed"
+            return "💀 Day missed"
         }
     }
 
@@ -161,7 +157,6 @@ final class AppCoordinator: ObservableObject {
     }
 
     /// Start a fresh bonus session for today's calendar date with a custom reckoning time.
-    /// Streak isn't affected by this session — it's pure bonus.
     /// If the chosen reckoning time has already passed, open reckoning immediately
     /// rather than scheduling a timer that will never fire.
     func startNewSession(reckoningTime hhmm: String) {
@@ -208,7 +203,7 @@ final class AppCoordinator: ObservableObject {
     }
 
     func submitReckoning(date: String, retroactiveDoneIds: Set<Int64>, skipReasons: [Int64: String]) {
-        let _ = repo.submitReckoning(date: date, retroactiveDoneIds: retroactiveDoneIds, skipReasons: skipReasons)
+        repo.submitReckoning(date: date, retroactiveDoneIds: retroactiveDoneIds, skipReasons: skipReasons)
         refreshState()
     }
 

@@ -9,7 +9,6 @@ struct Day: Codable, Equatable, Hashable, FetchableRecord, PersistableRecord {
     var lockedAt: Date?
     var reckonedAt: Date?
     var reckoningTime: String
-    var streakAfter: Int?
 
     enum Columns {
         static let date = Column(CodingKeys.date)
@@ -22,6 +21,5 @@ struct Day: Codable, Equatable, Hashable, FetchableRecord, PersistableRecord {
         case lockedAt = "locked_at"
         case reckonedAt = "reckoned_at"
         case reckoningTime = "reckoning_time"
-        case streakAfter = "streak_after"
     }
 }

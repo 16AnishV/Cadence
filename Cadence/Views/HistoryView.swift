@@ -7,16 +7,12 @@ struct HistoryView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            HStack {
-                Text("History")
-                    .font(.title2.bold())
-                Spacer()
-                Text("🔥 \(coord.streak)")
-                    .font(.headline)
-            }
-            .padding(.horizontal, 16)
-            .padding(.top, 16)
-            .padding(.bottom, 8)
+            Text("History")
+                .font(.title2.bold())
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, 16)
+                .padding(.top, 16)
+                .padding(.bottom, 8)
 
             Divider()
 
@@ -51,6 +47,7 @@ struct HistoryView: View {
 }
 
 struct HistoryRow: View {
+    @EnvironmentObject var coord: AppCoordinator
     let day: Day
     var body: some View {
         HStack {
@@ -66,7 +63,8 @@ struct HistoryRow: View {
     private var statusBadge: some View {
         switch day.state {
         case .reckoned:
-            Text("🔥 \(day.streakAfter ?? 0)").font(.caption)
+            let p = coord.repo.progress(for: day.date)
+            Text("✓ \(p.done)/\(p.total)").font(.caption).foregroundStyle(.green)
         case .autoMissed:
             Text("💀 missed").font(.caption).foregroundStyle(.red)
         case .locked, .allDone, .reckoningOpen:
@@ -122,9 +120,6 @@ struct DayDetailView: View {
         let done = tasks.filter { $0.status == .done }.count
         let total = tasks.count
         Text("\(done)/\(total) completed").font(.subheadline)
-        if let s = day.streakAfter {
-            Text("Streak after: \(s)").font(.subheadline).foregroundStyle(.secondary)
-        }
         Text(day.state.rawValue.replacingOccurrences(of: "_", with: " ").lowercased())
             .font(.caption)
             .foregroundStyle(.secondary)

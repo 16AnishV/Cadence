@@ -1,16 +1,17 @@
 import SwiftUI
-import UniformTypeIdentifiers
 
-/// Lightweight drag payload carrying a task's id for drag-to-reorder.
-struct DraggableTaskID: Codable, Transferable {
+/// Lightweight drag payload carrying a task's id for drag-to-reorder. Transfers as plain
+/// text over the built-in `public.text` UTI so no custom exported type needs to be declared
+/// in Info.plist — a custom UTI that isn't registered with Launch Services silently breaks
+/// `.dropDestination` type-matching (the drop target never activates).
+struct DraggableTaskID: Transferable {
     let id: Int64
     static var transferRepresentation: some TransferRepresentation {
-        CodableRepresentation(contentType: .cadenceTask)
+        ProxyRepresentation(
+            exporting: { String($0.id) },
+            importing: { DraggableTaskID(id: Int64($0) ?? -1) }
+        )
     }
-}
-
-extension UTType {
-    static let cadenceTask = UTType(exportedAs: "com.cadence.task")
 }
 
 struct TaskView: View {

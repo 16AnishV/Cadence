@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.7] — 2026-07-20
+
+### Streak removed
+
+- **No more streak.** The consecutive-all-done-days streak is gone entirely — the `🔥 N` badge no longer appears in the planner, task list, all-done, pending-reckoning, or history headers, and the menu bar text drops its `🔥 N ·` prefix. The streak added pressure without being useful: a broken streak nudged toward gaming the plan rather than doing the work, and nothing in the app actually branched on its value.
+- **History shows completion, not streak.** A reckoned day's history badge now reads `✓ done/total` (e.g. `✓ 3/3`) — the fact you actually care about — in place of the old streak count. The day-detail "Streak after" line is gone too.
+- **Neutral missed-day copy.** The auto-missed popover leads with `💀 Day missed.` instead of `💀 Streak reset to 0.`, and the "Reset streak to 0" control was removed from Settings.
+- **Clean data migration.** A v2 database migration drops the `streak_after` column and the `current_streak` value in place, so existing installs lose the stored streak without a reset or data loss on first launch of this version.
+
+### Reorder tasks
+
+- **Drop target now activates.** Dragging a task by its `≡` handle lifted the row but no row would accept the drop and the accent drop-line never appeared. The drag payload had declared a custom drag type the app bundle never registered, so the drop destination couldn't recognize what was being dragged. It now carries the task id as plain text over a built-in type, so drops land and reordering completes.
+
 ## [1.6] — 2026-07-16
 
 ### Reorder tasks

@@ -53,9 +53,13 @@ enum CadenceDatabase {
 
         // Drop the streak concept entirely: the days.streak_after column and the
         // current_streak app_state key. The feature was removed as not useful.
+        // Guard the column drop so fresh installs — whose v1 no longer creates
+        // streak_after — don't fail this migration; only upgraders have the column.
         m.registerMigration("v2") { db in
-            try db.alter(table: "days") { t in
-                t.drop(column: "streak_after")
+            if try db.columns(in: "days").contains(where: { $0.name == "streak_after" }) {
+                try db.alter(table: "days") { t in
+                    t.drop(column: "streak_after")
+                }
             }
             try db.execute(sql: "DELETE FROM app_state WHERE key = 'current_streak'")
         }
